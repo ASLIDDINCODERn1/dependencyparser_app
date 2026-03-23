@@ -200,7 +200,7 @@ export default function App() {
     setLoading(true); setError(""); setTokens(null); setTableVis(false);
 
     try {
-      const res = await fetch("analyze", {
+      const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
