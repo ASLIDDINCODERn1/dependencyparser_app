@@ -19,15 +19,23 @@ export default async function handler(req, res) {
       body: JSON.stringify(req.body),
     })
 
-    const data = await response.json()
+    const text = await response.text()
 
-    if (!response.ok) {
-      return res.status(response.status).json(data)
+    if (!text) {
+      return res.status(502).json({ error: 'Empty response from Anthropic API' })
     }
 
-    return res.status(200).json(data)
+    let data
+    try {
+      data = JSON.parse(text)
+    } catch (parseErr) {
+      console.error('Failed to parse Anthropic response:', text)
+      return res.status(502).json({ error: 'Invalid JSON from Anthropic API' })
+    }
+
+    return res.status(response.ok ? 200 : response.status).json(data)
   } catch (err) {
     console.error('Anthropic proxy error:', err)
-    return res.status(500).json({ error: 'Internal server error' })
+    return res.status(500).json({ error: err.message || 'Internal server error' })
   }
 }
